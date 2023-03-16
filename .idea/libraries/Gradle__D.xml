@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Gradle: D">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/app/libs/aip-java-sdk-4.16.9.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
