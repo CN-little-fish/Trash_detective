@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_light_gary"
+    android:orientation="vertical"
+    tools:context=".S_UserInfoActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvStatusBar"
+            android:layout_width="match_parent"
+            android:layout_height="25dp"
+            android:visibility="gone" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:background="@color/white"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/back_toolBar"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:paddingLeft="16dp"
+                android:src="@mipmap/icon_new_back" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="个人中心"
+                android:textColor="#333333"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+        </RelativeLayout>
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="550dp"
+        android:layout_weight="5"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="85dp"
+            android:layout_height="85dp"
+            android:src="@mipmap/ic_launcher" />
+
+        <TextView
+            android:id="@+id/user_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:text="@string/loading"
+            android:textColor="#333333"
+            android:textSize="24sp" />
+
+        <LinearLayout
+            android:id="@+id/star"
+            style="@style/UserBottomLLStyle"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="10dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="我的收藏"
+                android:textColor="#333333"
+                android:textSize="16sp" />
+
+            <ImageView
+                android:id="@+id/setting_red_point"
+                style="@style/UserBottomPointStyle"
+                android:src="@drawable/bg_round_red" />
+
+            <ImageView
+                style="@style/UserBottomBackStyle"
+                android:layout_width="11dp"
+                android:layout_height="7dp"
+                android:src="@mipmap/ic_user_back" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/change_password"
+            style="@style/UserBottomLLStyle"
+            android:layout_marginBottom="10dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="修改密码"
+                android:textColor="#333333"
+                android:textSize="16sp" />
+
+            <ImageView
+                style="@style/UserBottomPointStyle"
+                android:src="@drawable/bg_round_red" />
+
+            <ImageView
+                style="@style/UserBottomBackStyle"
+                android:src="@mipmap/ic_user_back" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/help_setting"
+            style="@style/UserBottomLLStyle"
+            android:layout_marginBottom="10dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="帮助"
+                android:textColor="#333333"
+                android:textSize="16sp" />
+
+            <ImageView
+                style="@style/UserBottomPointStyle"
+                android:src="@drawable/bg_round_red" />
+
+            <ImageView
+                style="@style/UserBottomBackStyle"
+                android:src="@mipmap/ic_user_back" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp">
+
+        <Button
+            android:id="@+id/logout"
+            android:layout_width="334dp"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:background="#7EED2D2D"
+            android:gravity="center"
+            android:text="退出登录" />
+
+    </RelativeLayout>
+
+
+
+
+</LinearLayout>

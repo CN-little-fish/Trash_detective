@@ -1,0 +1,52 @@
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/newsTitle"
+    android:layout_width="match_parent"
+    android:layout_height="135dp"
+    android:background="#61EFEAEA">
+
+
+    <TextView
+        android:id="@+id/String_name"
+        android:layout_width="127dp"
+        android:layout_height="39dp"
+        android:layout_marginStart="32dp"
+        android:text="@string/loading"
+        android:textSize="24sp"
+        app:layout_constraintStart_toEndOf="@+id/First_char"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/String_description"
+        android:layout_width="241dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/loading"
+        app:layout_constraintStart_toEndOf="@+id/First_char"
+        app:layout_constraintTop_toBottomOf="@+id/String_name" />
+
+    <TextView
+        android:id="@+id/First_char"
+        android:layout_width="105dp"
+        android:layout_height="106dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/button_1"
+        android:gravity="center|center_vertical"
+        android:text="好"
+        android:textSize="48sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/String_score"
+        android:layout_width="106dp"
+        android:layout_height="31dp"
+        android:layout_marginStart="8dp"
+        android:text="@string/loading"
+        app:layout_constraintStart_toEndOf="@+id/String_name"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,35 @@
+package com.zwk.trash_detective.Bean;
+
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+import androidx.annotation.Nullable;
+
+public class B_UserDatabase extends SQLiteOpenHelper {
+
+
+    public B_UserDatabase(@Nullable Context context, @Nullable String name, @Nullable SQLiteDatabase.CursorFactory factory, int version) {
+        super(context, name, factory, version);
+    }
+
+    String userdata = "create table user (" +
+            "id integer primary key autoincrement, " +
+            "name text, " +
+            "password text, " +
+            "email text, " +
+            "phonenum text)";
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        //创建表的SQL语句
+        db.execSQL(userdata);
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("drop table if exists user");
+        onCreate(db);//重新创建
+    }
+
+}

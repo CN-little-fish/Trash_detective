@@ -1,0 +1,41 @@
+package com.zwk.trash_detective.Bean;
+
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+
+import androidx.annotation.Nullable;
+
+import java.util.ArrayList;
+
+public class B_UserStarDatabase extends SQLiteOpenHelper {
+
+    public B_UserStarDatabase(@Nullable Context context, @Nullable String name, @Nullable SQLiteDatabase.CursorFactory factory, int version) {
+        super(context, name, factory, version);
+    }
+
+    String userdata = "create table star (" +
+            "uuid text, " +
+            "id integer, " +
+            "name text, " +
+            "sortId integer, " +
+            "root text, " +
+            "description text, " +
+            "url text)";
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        //创建表的SQL语句
+        db.execSQL(userdata);
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("drop table if exists userdata ");
+        onCreate(db);//重新创建
+    }
+
+}

@@ -1,0 +1,283 @@
+//此代码要用
+package com.zwk.trash_detective;
+
+import android.content.ActivityNotFoundException;
+import android.content.ContentUris;
+import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Point;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Environment;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
+import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.baidu.aip.imageclassify.AipImageClassify;
+import com.camerakit.CameraKitView;
+import com.zwk.trash_detective.Model.DataFlow;
+import com.zwk.trash_detective.Bean.D_BaiTrashData;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.util.HashMap;
+
+import retrofit2.http.Url;
+
+public class CameraActivity extends AppCompatActivity implements View.OnTouchListener{
+    private CameraKitView cameraKitView;
+    private Button actionButton;
+    private Button performAblum;
+    private Context context;
+
+    private int control_flag = 0;
+
+    private String APP_ID = "27207070";
+    private String API_KEY = "18cHrYr9qm19xE6DDyTKWegh";
+    private String SECRET_KEY = "krFPCNQLGX16PB4UMIiXcsd9UWbGXu5G";
+    private AipImageClassify aipImageClassify =  new AipImageClassify(APP_ID, API_KEY, SECRET_KEY);
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_camera_api);
+        this.context = this;
+        cameraKitView = findViewById(R.id.camera);
+        actionButton = findViewById(R.id.picture);
+        performAblum = findViewById(R.id.ablum);
+        performAblum.setOnTouchListener(this);
+        actionButton.setOnTouchListener(this);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        cameraKitView.onStart();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        cameraKitView.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        cameraKitView.onPause();
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        cameraKitView.onStop();
+        super.onStop();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        cameraKitView.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        switch (v.getId()) {
+            case R.id.picture: {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    actionButton.setBackgroundResource(R.drawable.button_2);
+                }
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    actionButton.setBackgroundResource(R.drawable.button_1);
+                    Intent takeIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+                    //下面这句指定调用相机拍照后的照片存储的路径
+                    startActivityForResult(takeIntent, 1);
+
+                    LoadingDialog.show(this);
+                    showToast("正在保存图像");
+                    control_flag = 1;
+                    this.tackPicture();
+                    actionButton.performClick();
+                }
+                break;
+            }
+            case R.id.ablum: {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    showToast("打开相册");
+                    Intent intents = new Intent(Intent.ACTION_OPEN_DOCUMENT);//调用相册的action
+                    intents.addCategory(Intent.CATEGORY_OPENABLE);//调用相册的category
+                    intents.setType("image/*");//调用相册的type
+                    startActivityForResult(intents,1);//隐式打开方式
+                    LoadingDialog.show(this);
+                    control_flag = 2;
+                }
+            }
+        }
+        return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+    }
+
+    /**
+     * android 4.4以前的处理方式
+     * @param data
+     */
+    private void handleImageOnKitKat(Intent data) {
+        String imagePath = null;
+        Uri uri = data.getData();
+        if (DocumentsContract.isDocumentUri(this, uri)) {
+            // 如果是document类型的Uri，则通过document id处理
+            String docId = DocumentsContract.getDocumentId(uri);
+            if ("com.android.providers.media.documents".equals(uri.getAuthority())) {
+                String id = docId.split(":")[1];
+                // 解析出数字格式的id
+                String selection = MediaStore.Images.Media._ID + "=" + id;
+                imagePath = getImagePath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, selection);
+            } else if ("com.android.providers.downloads.documents".equals(uri.getAuthority())) {
+                Uri contentUri = ContentUris.withAppendedId(Uri.parse("content: //downloads/public_downloads"), Long.valueOf(docId));
+                imagePath = getImagePath(contentUri, null);
+            }
+        } else if ("content".equalsIgnoreCase(uri.getScheme())) {
+            // 如果是content类型的Uri，则使用普通方式处理
+            imagePath = getImagePath(uri, null);
+        } else if ("file".equalsIgnoreCase(uri.getScheme())) {
+            // 如果是file类型的Uri，直接获取图片路径即可
+            imagePath = uri.getPath();
+        }
+        // 根据图片路径显示图片
+        displayImage(imagePath);
+    }
+
+    private String getImagePath(Uri uri, String selection) {
+        String path = null;
+        // 通过Uri和selection来获取真实的图片路径
+        Cursor cursor = getContentResolver().query(uri, null, selection, null, null);
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
+            }
+            cursor.close();
+        }
+        return path;
+    }
+
+    private void displayImage(String imagePath) {
+        if (imagePath != null) {
+//            Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
+//
+//            //Bitmap转换成byte[]
+//            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+//            byte[] datas = baos.toByteArray();
+
+            //imageView.setImageBitmap(bitmap);
+
+            try {
+                FileInputStream fin = new FileInputStream(new File(imagePath));
+                File savedPhoto = new File(Environment.getExternalStorageDirectory(), "cache1.jpg");
+                FileOutputStream outputStream = new FileOutputStream(savedPhoto.getPath());
+
+                byte[] bytes = new byte[fin.available()];
+                //将文件内容写入字节数组
+                fin.read(bytes);
+                fin.close();
+                //保存图片
+                outputStream.write(bytes);
+                outputStream.close();
+
+                new NetLoadingThread(bytes).start();
+
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
+        } else {
+            Toast.makeText(this, "获取相册图片失败", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void showToast(final String text) {
+        runOnUiThread(() -> Toast.makeText(CameraActivity.this, text, Toast.LENGTH_SHORT).show());
+    }
+
+    private void tackPicture(){
+        cameraKitView.captureImage((cameraKitView, capturedImage) -> {
+            File savedPhoto = new File(Environment.getExternalStorageDirectory(), "cache.jpg");
+            try {
+                new NetLoadingThread(capturedImage).start();
+                FileOutputStream outputStream = new FileOutputStream(savedPhoto.getPath());
+                outputStream.write(capturedImage);
+                outputStream.close();
+
+            } catch (java.io.IOException e) {
+                e.printStackTrace();
+                LoadingDialog.dismiss();
+            }
+        });
+    }
+
+    class NetLoadingThread extends Thread{
+        byte[] capturedImage;
+        NetLoadingThread(byte[] capturedImage){
+            this.capturedImage = capturedImage;
+        }
+        @Override
+        public void run() {
+                Intent intent = null;
+                showToast("正在发送请求");
+                aipImageClassify.setConnectionTimeoutInMillis(2000);
+                aipImageClassify.setSocketTimeoutInMillis(6000);
+                HashMap options = new HashMap<String, String>();
+                options.put("baike_num", "5");
+                try {
+                    JSONObject res = aipImageClassify.advancedGeneral(capturedImage, options);
+                    JSONArray jsonarray  = new JSONArray(res.get("result").toString());
+                    Log.d("YEs", jsonarray.toString());
+                    Bundle bundle = new Bundle();
+                    for (int i = 0; i < jsonarray.length(); i++) {
+                        JSONObject temp = jsonarray.getJSONObject(i);
+                        TrashData tr = new TrashData(temp.get("keyword").toString(),temp.get("score").toString(), temp.get("root").toString(),temp.get("baike_info").toString());
+                        bundle.putSerializable("persion" + i,tr);
+                    }
+                    if (bundle != null){
+                        intent = new Intent(CameraActivity.this, MainActivity2.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                        intent.putExtras(bundle);
+                        intent.putExtra("control_flag",control_flag);
+                    }
+                    LoadingDialog.dismiss();
+                    if (intent != null) {
+                        try{
+                        context.startActivity(intent);
+                        finish();
+                        }catch (ActivityNotFoundException e){
+                            e.printStackTrace();
+                        }
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                    showToast("连接服务异常");
+                    LoadingDialog.dismiss();
+                }
+        }
+    }
+}
